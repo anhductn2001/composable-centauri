@@ -13,18 +13,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Docker compose
+        run: docker-compose up -d
+
+      - name: Copy binary
+        run: docker cp composable-centauri-node-1:/usr/bin/centaurid ./centaurid
+
+      - name: Save sha256 sum
+        run: sha256sum ./centaurid > ./centaurid_sha256.txt
+
       - name: Release
-        uses: wangyoucao577/go-release-action@v1      
+        uses: softprops/action-gh-release@v1        
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: linux
-          goarch: amd64
-          asset_name: centaurid
-          sha256sum: TRUE
-          build_flags: -tags "netgo ledger"
-          ldflags: -X github.com/cosmos/cosmos-sdk/version.Name=centauri 
-                    -X github.com/cosmos/cosmos-sdk/version.AppName=centaurid 
-                    -X github.com/cosmos/cosmos-sdk/version.Version=${{ env.APP_VERSION }}
-                    -X github.com/cosmos/cosmos-sdk/version.Commit=${{env.GITHUB_SHA}}
-                    -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo ledger" 
-                    -w -s
+          token: ${{ github.token }}
+          files: |
+            centaurid
+            centaurid_sha256.txt
+
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
