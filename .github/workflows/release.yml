@@ -12,6 +12,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      -
+        name: Parse tag
+        id: tag
+        run: |
+          COMMIT := $(shell git log -1 --format='%H')
+          echo "COMMIT" >> $GITHUB_ENV
 
       - name: Release
         uses: wangyoucao577/go-release-action@v1      
@@ -24,7 +30,7 @@ jobs:
           build_flags: -tags "netgo ledger"
           ldflags: -X github.com/cosmos/cosmos-sdk/version.Name=centauri 
                     -X github.com/cosmos/cosmos-sdk/version.AppName=centaurid 
-                    -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION)
-                    -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
-                    -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo ledger," 
+                    -X github.com/cosmos/cosmos-sdk/version.Version=${{ env.APP_VERSION }}
+                    -X github.com/cosmos/cosmos-sdk/version.Commit=${{github.COMMIT}}
+                    -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo ledger" 
                     -w -s
