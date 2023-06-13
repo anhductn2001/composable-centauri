@@ -1,0 +1,30 @@
+---
+name: Release Binary
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Release
+        uses: wangyoucao577/go-release-action@v1      
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: linux
+          goarch: amd64
+          asset_name: centaurid
+          sha256sum: TRUE
+          build_flags: -tags "netgo ledger"
+          ldflags: -X github.com/cosmos/cosmos-sdk/version.Name=centauri 
+                    -X github.com/cosmos/cosmos-sdk/version.AppName=centaurid 
+                    -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION)
+                    -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
+                    -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo ledger," 
+                    -w -s
