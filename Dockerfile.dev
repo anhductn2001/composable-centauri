@@ -59,7 +59,7 @@ ENV HOME /centauri
 
 WORKDIR $HOME
 
-COPY scripts/* /centauri
+COPY scripts/* /centauri/
 # rest server
 EXPOSE 1317
 # tendermint p2p
